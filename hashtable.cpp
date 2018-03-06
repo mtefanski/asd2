@@ -136,7 +136,7 @@ public:
 		int index = hash(key_);
 		int deleted = 0;
 
-		//_______________usuwanie elementu o podanym kluczu_____________
+		//usuwanie elementu o podanym kluczu
 		while (tab[index].getFlag() != 'E')
 		{
 			if (tab[index].getKey() == key_ && tab[index].getValue() != " ")
@@ -153,9 +153,9 @@ public:
 					index = 0;
 			}
 		}
-		//_________________________________________________________________
+		//___
 
-		//______________________ile elementow o zadanym hashu jest w lancuchu?
+		//ile elementow o zadanym hashu jest w lancuchu?
 		int elementow = 0;
 		int ostatni = 0;
 
@@ -174,9 +174,9 @@ public:
 			if (index == size)
 				index = 0;
 		}
-		//____________________________________________________________________
+		//_
 
-		//____________________________________________________________________
+		//zmiana flag
 		if (elementow == 1)
 		{
 			Add(tab[ostatni].getKey(), tab[ostatni].getValue());
@@ -190,7 +190,7 @@ public:
 			tab[ostatni].setKey(0);
 			tab[ostatni].setValue(" ");
 		}
-		//_______________________________________________________________________
+		//___
 		ustawFlagi(ostatni);
 	}
 
