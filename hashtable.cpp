@@ -7,9 +7,7 @@ private:
 
 	long key;
 	std::string value;
-	//bool flag;
 	char flag;
-
 
 public:
 
@@ -19,27 +17,6 @@ public:
 		value(" "),
 		flag('E')
 	{
-	}
-
-	tablica(const tablica & copy)
-		:
-		key(copy.key),
-		value(copy.value),
-		flag(copy.flag)
-	{
-	}
-
-	tablica operator=(const tablica& copy)
-	{
-		if (this == &copy)
-			return *this;
-		else
-		{
-			key = copy.key;
-			value = copy.key;
-			flag = copy.flag;
-			return *this;
-		}
 	}
 
 	void setKey(long key_)
@@ -74,7 +51,7 @@ public:
 
 	tablica getTablica()
 	{
-		std::cout << key << " " << value << " " << flag << std::endl;
+		std::cout << key << " " << value << std::endl;
 		return *this;
 	}
 
@@ -90,41 +67,6 @@ public:
 		:
 		size(0)
 	{
-	}
-
-	HT(const HT & copy)
-		:
-		size(copy.size)
-	{
-		tab = new tablica[size];
-
-		for (int i = 0; i < size; i++)
-		{
-			tab[i].setKey(copy.tab[i].getKey());
-			tab[i].setValue(copy.tab[i].getValue());
-			tab[i].setFlag(copy.tab[i].getFlag());
-		};
-	}
-
-	HT operator=(const HT& copy)
-	{
-		if (this == &copy)
-			return *this;
-		else
-		{
-			size = copy.size;
-
-			tab = new tablica[size];
-
-			for (int i = 0; i < size; i++)
-			{
-				tab[i].setKey(copy.tab[i].getKey());
-				tab[i].setValue(copy.tab[i].getValue());
-				tab[i].setFlag(copy.tab[i].getFlag());
-			};
-
-			return *this;
-		}
 	}
 
 	~HT()
@@ -180,11 +122,11 @@ public:
 
 		for (int i = 0; i < size; i++)
 		{
-			/*if (tab[i].getValue() != " ")
-			{*/
+			if (tab[i].getValue() != " ")
+			{
 				std::cout << i << " ";
 				tab[i].getTablica();
-			/*}*/
+			}
 		}
 		std::cout << std::endl;
 	}
@@ -193,84 +135,94 @@ public:
 	{
 		int index = hash(key_);
 		int deleted = 0;
-		bool flag = false;
 
-		do {
-			if (tab[index].getKey() == key_ && tab[index].getValue() != " " )
+		//_______________usuwanie elementu o podanym kluczu_____________
+		while (tab[index].getFlag() != 'E')
+		{
+			if (tab[index].getKey() == key_ && tab[index].getValue() != " ")
 			{
 				tab[index].setKey(0);
 				tab[index].setValue(" ");
-				tab[index].setFlag('E');
 				deleted = index;
-				flag = true;
+				break;
 			}
-
-			else if (tab[index].getFlag() == 'C')
+			else
 			{
 				index++;
 				if (index == size)
 					index = 0;
 			}
+		}
+		//_________________________________________________________________
 
-		} while (flag != true);
+		//______________________ile elementow o zadanym hashu jest w lancuchu?
+		int elementow = 0;
+		int ostatni = 0;
 
-		//wypelnianie wolnego miejsca
-		//int replaced;
-		index = deleted+1;
-		flag = false;
-		do {
-			if (hash(tab[index].getKey()) == deleted)
+		while (tab[index].getFlag() != 'E')
+		{
+			if (hash(tab[index].getKey()) == hash(key_) && tab[index].getValue() != " ")
 			{
-				Add(tab[index].getKey(), tab[index].getValue());
-				//replaced = index;
-				tab[index].setKey(0);
-				tab[index].setValue(" ");
-				flag = true;
-
-			}
-			else if (tab[index].getFlag() == 'C' || tab[index].getFlag() == 'F')
-			{
-				index++;
-				if (index == size)
-					index = 0;
+				elementow++;
+				ostatni = index;
 			}
 
-		} while (flag != true);
-		
-		//ustawianie flag od nowa
+			if (tab[index].getFlag() == 'F')
+				break;
 
-		index = deleted + 1;
-		flag = false;
-		/*std::cout << replaced << std::endl;
-
-		for (replaced; replaced >= deleted; replaced--)
-		{
-			std::cout << replaced;
-		}
-		std::cout << std::endl;*/
-
-		do {
-		if (tab[index].getFlag() == 'C' && tab[index + 1].getFlag() == 'F' && tab[index + 1].getValue() == " ")
-		{
-			tab[index].setFlag('F');
-			tab[index + 1].setFlag('E');
-			flag = true;
-			//break;
-		}
-		else if (tab[index].getFlag() == 'F' && tab[index].getValue() == " ")
-		{
-			tab[index].setFlag('E');
-			flag = true;
-			//break;
-		}
-		/*else if (tab[index].getFlag() == 'C' && tab[index + 1].getFlag() == 'C')
-		{
 			index++;
 			if (index == size)
 				index = 0;
-		}*/
-		} while (flag == false);
+		}
+		//____________________________________________________________________
 
+		//____________________________________________________________________
+		if (elementow == 1)
+		{
+			Add(tab[ostatni].getKey(), tab[ostatni].getValue());
+			tab[ostatni].setKey(0);
+			tab[ostatni].setValue(" ");
+		}
+		else if (elementow > 1)
+		{
+			Add(tab[ostatni].getKey(), tab[ostatni].getValue());
+			tab[deleted].setFlag('C');
+			tab[ostatni].setKey(0);
+			tab[ostatni].setValue(" ");
+		}
+		//_______________________________________________________________________
+		ustawFlagi(ostatni);
+	}
+
+	void ustawFlagi(int index_)
+	{
+		if (tab[index_].getFlag() == 'F')
+		{
+			tab[index_].setFlag('E');
+			tab[index_ - 1].setFlag('F');
+		}
+		else if (tab[index_].getFlag() == 'C')
+		{
+
+			index_++;
+			while (tab[index_].getFlag() != 'E')
+			{
+				if (hash(tab[index_].getKey()) != index_)
+				{
+					Add(tab[index_].getKey(), tab[index_].getValue());
+					tab[index_].setKey(0);
+					tab[index_].setValue(" ");
+					ustawFlagi(index_);
+				}
+
+				if (tab[index_].getFlag() == 'F')
+					break;
+
+				index_++;
+				if (index_ == size)
+					index_ = 0;
+			}
+		}
 	}
 
 	int hash(long key_)
@@ -281,23 +233,14 @@ public:
 
 int main()
 {
-
 	HT ht_;
 	ht_.Size(10);
 	ht_.Add(13, "ala");
-	//ht_.Print();
-	ht_.Add(24, "ola");
-	//ht_.Add(25, "jola");
-	ht_.Add(23, "ela");
-	//ht_.Print();
-	//ht_.Delete(13);
-	//ht_.Print();
-	//ht_.Add(19, "aaa");
-	//ht_.Add(29, "bbb");
+	ht_.Print();
+	ht_.Add(23, "ola");
 	ht_.Print();
 	ht_.Delete(13);
 	ht_.Print();
-
 
 	system("pause");
 	return 0;
