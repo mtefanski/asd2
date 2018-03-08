@@ -71,7 +71,8 @@ public:
 
 	~HT()
 	{
-		delete[] tab;
+		if(tab)
+			delete[] tab;
 	}
 
 	void Size(int size_)
@@ -176,7 +177,7 @@ public:
 		}
 		//_
 
-		//zmiana flag
+		//relokacja elemetow
 		if (elementow == 1)
 		{
 			Add(tab[ostatni].getKey(), tab[ostatni].getValue());
@@ -233,14 +234,64 @@ public:
 
 int main()
 {
-	HT ht_;
-	ht_.Size(10);
-	ht_.Add(13, "ala");
-	ht_.Print();
-	ht_.Add(23, "ola");
-	ht_.Print();
-	ht_.Delete(13);
-	ht_.Print();
+	int licznik = 0;
+	int liczba_przypadkow;
+	
+	std::cin >> liczba_przypadkow;
+	
+	while (licznik < liczba_przypadkow)
+	{
+		HT ht_;
+		std::string komenda;
+		while (komenda != "stop")
+		{
+			std::getline(std::cin, komenda);
+			if (komenda[0] == 's' && komenda[1] == 'i' && komenda[2] == 'z' && komenda[3] == 'e')
+			{
+				std::string st_liczba;
+
+				for (int i = 5; i < komenda.length(); i++)
+				{
+					st_liczba += komenda[i];
+				}
+				int size = std::stoi(st_liczba);
+				ht_.Size(size);
+			}
+			else if (komenda[0] == 'a' && komenda[1] == 'd' && komenda[2] == 'd')
+			{
+				std::string st_key;
+				std::string value;
+				int i = 4;
+				while (komenda[i] != ' ')
+				{
+					st_key += komenda[i];
+					i++;
+				}
+				long key = std::stol(st_key);
+				
+				for (i++; i < komenda.length(); i++)
+				{
+					value += komenda[i];
+				}
+				ht_.Add(key, value);
+			}
+			else if (komenda == "print")
+			{
+				ht_.Print();
+			}
+			else if (komenda[0] == 'd' && komenda[1] == 'e' && komenda[2] == 'l' && komenda[3] == 'e' && komenda[4] == 't' && komenda[5] == 'e')
+			{
+				std::string st_key;
+				for (int i = 7; i < komenda.length(); i++)
+				{
+					st_key += komenda[i];
+				}
+				long key = std::stol(st_key);
+				ht_.Delete(key);
+			}
+		}
+		licznik++;
+	}
 
 	system("pause");
 	return 0;
